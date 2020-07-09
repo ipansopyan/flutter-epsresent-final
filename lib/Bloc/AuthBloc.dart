@@ -32,6 +32,7 @@ class AuthBloc{
     var jsonObject  = json.decode(loginResult.body);
     if (loginResult.statusCode == 200) {
       _save(jsonObject["token"]);
+      _saveid(jsonObject["id"].toString());
       return AuthBloc.loginResult(jsonObject);
     } else if(loginResult.statusCode == 401) {
       print("teu konek");
@@ -47,4 +48,11 @@ class AuthBloc{
     final key = 'token';
     final value = token;
     prefs.setString(key, value);
+  }
+
+  _saveid(String id) async {
+    final prefs = await SharedPreferences.getInstance();
+    final keyid = 'id';
+    final valueid = id;
+    prefs.setString(keyid, valueid);
   }

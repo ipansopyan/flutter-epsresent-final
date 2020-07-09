@@ -1,24 +1,33 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
+
+
 
 
 class PresentBloc{
 
   String value;
+  String prt;
+  String matkul;
 
-  PresentBloc({this.value});
+  PresentBloc({this.value,this.prt,this.matkul});
 
   factory PresentBloc.presentResult(Map<String, dynamic> object){
     return PresentBloc(
       value: object['value'],
+      prt: object['prt'],
+      matkul: object['matkul'],
     );
   }
 
   static Future<PresentBloc> presentData(String value) async {
-    String myUrl  = "http://192.168.43.184:8000/api/present";
-    var presentResult = await http.post(myUrl,
-    body: {"value": value}
-    );
+    final prefs = await SharedPreferences.getInstance();
+    final keyid = 'id';
+    final valueid = prefs.get(keyid ) ?? 0;
+    String myUrl  = value+'&mhs_id='+valueid;
+    var presentResult = await http.post(myUrl);
+    
 
     var jsonObject  = json.decode(presentResult.body);
     if (presentResult.statusCode == 200) {

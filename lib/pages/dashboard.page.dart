@@ -13,7 +13,9 @@ class DashBoardPage extends StatefulWidget {
 
 class _DashBoardPageState extends State<DashBoardPage> {
   String data = "";
+  String msgStatus = null;
   AuthBloc authBloc;
+  PresentBloc presentBloc;
 
   
   @override
@@ -44,7 +46,7 @@ class _DashBoardPageState extends State<DashBoardPage> {
           // horizontal).
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(data)
+            Text(' ')
           ],
         ),
       ),
@@ -59,18 +61,42 @@ class _DashBoardPageState extends State<DashBoardPage> {
    void scanQR() async {
      var result = await scan();
       final prefs = await SharedPreferences.getInstance();
-      final key = 'token';
-      final value = prefs.get(key ) ?? 0;
-    //  PermissionStatus status = PermissionStatus.undetermined;
-    //  if (result == null) {
-    //    status = (await Permission.camera.isGranted) as PermissionStatus;
-    //  }
+      final keyid = 'id';
+      final valueid = prefs.get(keyid ) ?? 0;
 
     setState(() {
-      data = value;
-      print(value);
+      data = result;
+        PresentBloc.presentData(data).then((value) {
+          presentBloc = value;
+          if (presentBloc != null) {
+            _showDialog();
+            msgStatus = presentBloc.matkul;
+
+          }
+        } );
     });
 
 
    }
+
+   void _showDialog() {
+          showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: new Text('success'),
+                  content: new Text(msgStatus),
+                  actions: <Widget>[
+                    new RaisedButton(
+                      child: new Text(
+                        'tutup',
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ],
+                );
+              });
+        }
 }
