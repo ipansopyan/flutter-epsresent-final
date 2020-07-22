@@ -4,8 +4,6 @@ import 'package:qrscan/qrscan.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-
-
 class DashBoardPage extends StatefulWidget {
   @override
   _DashBoardPageState createState() => _DashBoardPageState();
@@ -17,7 +15,6 @@ class _DashBoardPageState extends State<DashBoardPage> {
   AuthBloc authBloc;
   PresentBloc presentBloc;
 
-  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,58 +42,65 @@ class _DashBoardPageState extends State<DashBoardPage> {
           // axis because Columns are vertical (the cross axis would be
           // horizontal).
           mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(' ')
-          ],
+          children: <Widget>[Text('')],
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: (){
+        onPressed: () {
           scanQR();
         },
         child: Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
-   }
-   void scanQR() async {
-     var result = await scan();
-      final prefs = await SharedPreferences.getInstance();
-      final keyid = 'id';
-      final valueid = prefs.get(keyid ) ?? 0;
+  }
+
+  void scanQR() async {
+    var result = await scan();
+    final prefs = await SharedPreferences.getInstance();
+    final keyid = 'id';
+    final valueid = prefs.get(keyid) ?? 0;
 
     setState(() {
       data = result;
+      print(data);
+      if (data.endsWith('1')) {
         PresentBloc.presentData(data).then((value) {
           presentBloc = value;
           if (presentBloc != null) {
             _showDialog();
-            msgStatus = presentBloc.matkul;
-
+            msgStatus = presentBloc.mahasiswa +
+                " anda berhasil mata kuliah " +
+                presentBloc.matkul +
+                " pertemuan ke-" +
+                presentBloc.prt;
           }
-        } );
+        });
+      }
+      if (data.endsWith('0')) {
+        _showDialog();
+        msgStatus = "Waktu Absen sudah habis, anda tidak bisa absen";
+      }
     });
+  }
 
-
-   }
-
-   void _showDialog() {
-          showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return AlertDialog(
-                  title: new Text('success'),
-                  content: new Text(msgStatus),
-                  actions: <Widget>[
-                    new RaisedButton(
-                      child: new Text(
-                        'tutup',
-                      ),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                  ],
-                );
-              });
-        }
+  void _showDialog() {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: new Text('success'),
+            content: new Text(msgStatus),
+            actions: <Widget>[
+              new RaisedButton(
+                child: new Text(
+                  'tutup',
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        });
+  }
 }

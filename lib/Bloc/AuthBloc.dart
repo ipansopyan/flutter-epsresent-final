@@ -30,6 +30,7 @@ class AuthBloc{
     );
 
     var jsonObject  = json.decode(loginResult.body);
+    print(jsonObject);
     if (loginResult.statusCode == 200) {
       _save(jsonObject["token"]);
       _saveid(jsonObject["id"].toString());
